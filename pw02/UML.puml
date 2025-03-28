@@ -1,0 +1,186 @@
+@startuml
+
+skinparam ClassAttributeIconSize 0
+
+interface Displayer {
+    + getWidth(): int
+    + getHeight(): int
+    + getGraphics(): Graphics2D
+    + repaint(): void
+    + setTitle(title: String): void
+    + addKeyListener(keyListener: KeyListener): void
+    {static} + getInstance(): Displayer
+}
+
+class DisplayerSingleton {
+    - instance: Displayer
+    - DisplayerSingleton()
+    {static} + registerInstance(impl: Class<? extends Displayer>): void
+    {static} + getInstance(): Displayer
+}
+
+interface Renderer {
+    + display(g: Graphics2D, b: Bouncable): void
+}
+
+interface Bouncable {
+    + draw(): void
+    + move(): void
+    + getColor(): Color
+    + getShape(): Shape
+}
+
+abstract class AbstractShape {
+    - x: int
+    - y: int
+    - size: int
+    - dx: int
+    - dy: int
+    + AbstractShape(x: int, y: int, size: int, dx: int, dy: int)
+    + getX(): int
+    + getY(): int
+    + getSize(): int
+    + move(): void
+    + reverseXDirection(): void
+    + reverseYDirection(): void
+    {abstract} + getRenderer(): Renderer
+    + draw(): void
+}
+
+interface ShapeAbstractFactory {
+    + createCircle(x: int, y: int, size: int, dx: int, dy: int): Circle
+    + createSquare(x: int, y: int, size: int, dx: int, dy: int): Square
+}
+
+class EmptyShapeConcreteFactory {
+    + createCircle(x: int, y: int, size: int, dx: int, dy: int): Circle
+    + createSquare(x: int, y: int, size: int, dx: int, dy: int): Square
+}
+
+class FilledShapeConcreteFactory {
+    + createCircle(x: int, y: int, size: int, dx: int, dy: int): Circle
+    + createSquare(x: int, y: int, size: int, dx: int, dy: int): Square
+}
+
+class InstanceEmpty {
+    {static} - instance: EmptyShapeRenderer
+}
+
+class EmptyShapeRenderer {
+    {static} + getInstance(): EmptyShapeRenderer
+    + display(g: Graphics2D, b: Bouncable): void
+}
+
+class InstanceFilled {
+    {static} - instance: FilledShapeRenderer
+}
+
+class FilledShapeRenderer {
+    {static} + getInstance(): FilledShapeRenderer
+    + display(g: Graphics2D, b: Bouncable): void
+}
+
+class Main {
+    - NB_SHAPES: int
+    - SIZE_MIN_SHAPE: int
+    - SIZE_DELTA_SHAPE: int
+    - SPEED_MAX_SHAPE: int
+    - SPEED_MIN_SHAPE: int
+    + Main()
+    + run(): void
+    - createShapes(factory: ShapeAbstractFactory): void
+    - randomNonZero(min: int, max: int): int
+    {static} + main(args: String[]): void
+}
+
+class BouncableActions {
+    - fillFactory: FilledShapeConcreteFactory
+    - emptyFactory: EmptyShapeConcreteFactory
+    + keyPressed(e: KeyEvent): void
+}
+
+abstract class Circle {
+    + Circle(x: int, y: int, size: int, dx: int, dy: int)
+    {abstract} + getColor(): Color
+    {abstract} + getRenderer(): Renderer
+}
+
+class EmptyCircle {
+    + EmptyCircle(x: int, y: int, size: int, dx: int, dy: int)
+    + getColor(): Color
+    # getRenderer(): Renderer
+}
+
+class FilledCircle {
+    + FilledCircle(x: int, y: int, size: int, dx: int, dy: int)
+    + getColor(): Color
+    # getRenderer(): Renderer
+}
+
+abstract class Square {
+    + Square(x: int, y: int, size: int, dx: int, dy: int)
+    {abstract} + getColor(): Color
+    {abstract} + getRenderer(): Renderer
+}
+
+class EmptySquare {
+    + EmptySquare(x: int, y: int, size: int, dx: int, dy: int)
+    + getColor(): Color
+    # getRenderer(): Renderer
+}
+
+class FilledSquare {
+    + FilledSquare(x: int, y: int, size: int, dx: int, dy: int)
+    + getColor(): Color
+    # getRenderer(): Renderer
+}
+
+class ShapeMovingApp {
+    - frame: JFrame
+    - panel: GraphicsPanel
+    + ShapeMovingApp()
+    + getWidth(): int
+    + getHeight(): int
+    + getGraphics(): Graphics2D
+    + repaint(): void
+    + setTitle(title: String): void
+    + addKeyListener(keyListener: KeyListener): void
+}
+
+class GraphicsPanel {
+    - img: Image
+    + GraphicsPanel()
+    + paintComponent(g: Graphics): void
+    - newImg(): void
+}
+
+class ResizeListener {
+    + componentResized(e: ComponentEvent): void
+}
+
+Displayer <-- DisplayerSingleton
+AbstractShape .u.|> Bouncable
+AbstractShape <|-- Circle
+AbstractShape <|-- Square
+ShapeAbstractFactory <|.. EmptyShapeConcreteFactory
+ShapeAbstractFactory <|.. FilledShapeConcreteFactory
+EmptyCircle -u-|> Circle
+FilledCircle -u-|> Circle
+EmptySquare -u-|> Square
+FilledSquare -u-|> Square
+Main --> BouncableActions
+BouncableActions -u-|> KeyAdapter
+
+ShapeMovingApp .u.|> Displayer
+ShapeMovingApp --> GraphicsPanel
+GraphicsPanel --> ResizeListener
+ResizeListener -u-|> ComponentAdapter
+
+FilledShapeRenderer --> InstanceFilled
+EmptyShapeRenderer --> InstanceEmpty
+FilledShapeRenderer .u.> Renderer
+EmptyShapeRenderer .u.> Renderer
+
+Main "1" --> "*" Bouncable : -bouncers
+
+@enduml

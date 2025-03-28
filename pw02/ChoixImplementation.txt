@@ -1,0 +1,3 @@
+Pour les shapes, on a utilisé des coordonnées x, y. On aurait pu créer une classe Position afin de gérer cet attribut et créer un modèle réutilisable mais cela ne nous paraissait pas indispensable pour ce projet.
+
+Je le précise pour pas que vous pensiez qu'il s'agit d'un oubli, c'est simplement un choix pour nous faciliter la vie.
